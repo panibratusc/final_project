@@ -33,3 +33,16 @@ if response.status_code == 200:
         #print(headline_NYT.text)
     # for description_NYT in descriptions_NYT:
     #     print(description_NYT.text)
+    
+#Retriving data from the Wall Street Journal
+#span class = 'container__headline-text'
+url = "https://www.cnn.com/world"
+response = requests.get(url)
+if response.status_code == 200:
+    html = response.text
+    soup = BeautifulSoup(html, 'html.parser')
+    headlines_text_CNN = soup.find_all('span', class_='container__headline-text')
+    for headline_text_CNN in headlines_text_CNN:
+        print(headline_text_CNN.text)
+else:
+    print("Error: Response code", response.status_code)
