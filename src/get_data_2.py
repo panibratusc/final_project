@@ -31,5 +31,5 @@ if response.status_code == 200:
     descriptions_NYT = soup.find_all('p', class_='1pga48a')
     #for headline_NYT in headlines_NYT:
         #print(headline_NYT.text)
-    for description_NYT in descriptions_NYT:
-        print(description_NYT.text)
+    # for description_NYT in descriptions_NYT:
+    #     print(description_NYT.text)
