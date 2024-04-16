@@ -3,6 +3,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 from io import StringIO
+import argparse
 
 # Two NBC html elements we are searching for that contain the caption and description of recent articles
 # <h2 class='wide-tease-item__headline'>
@@ -30,7 +31,11 @@ def get_NYT():
         soup = BeautifulSoup(html, 'html.parser')
         headlines_NYT = soup.find_all('h3', class_= 'css-1kv6qi')
         descriptions_NYT = soup.find_all('p', class_='1pga48a')
-        return [headline_NYT.text for headline_NYT in headlines_NYT], [description_NYT.text for description_NYT in descriptions_NYT]
+        headlines_NYT, descriptions_NYT = arrays_same_length(
+            [headline.text for headline in headlines_NYT],
+            [description.text for description in descriptions_NYT]
+        )
+        return headlines_NYT, descriptions_NYT
     else:
         print("Error: Response code", response.status_code)
 
@@ -43,19 +48,39 @@ def get_CNN():
     if response.status_code == 200:
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
-        headlines_text_CNN = soup.find_all('span', class_='container__headline-text')
-        return [headline_text_CNN.text for headline_text_CNN in headlines_text_CNN]
+        headlines_CNN = soup.find_all('span', class_='container__headline-text')
+        return [headline_CNN.text for headline_CNN in headlines_CNN]
     else:
         print("Error: Response code", response.status_code)
-
-def combine_data():
-    NBC_words = get_NBC()
-    NYT_words = get_NYT()
-    CNN_words = get_CNN()
-    all_words = list(CNN_words + NYT_words + NBC_words)
-    all_words = [word.lower() for word in all_words]
-    df = pd.DataFrame(all_words, columns=['Words'])
-    print(df)
+        return []
     
-combine_data()
+#Making the arrays the same length 
+def arrays_same_length(arr1, arr2):
+    min_length = min(len(arr1), len(arr2))
+    return arr1[:min_length], arr2[:min_length]
     
+#Creating a datatable for all the news sources
+def create_data_table(headlines, descriptions):
+    df = pd.DataFrame({
+        'Headlines': headlines, 
+        'Descriptions': descriptions
+    })
+    return df
+def main():
+    parser = argparse.ArgumentParser(description='create a data table of descriptions and headlines from the various news sources')
+    parser.add_argument('--source', choices=['CNN','NYT','NBC'], help="Specify the news source: 'NBC', 'NYT', or 'CNN'", required=True)
+    args = parser.parse_args()
+    if args.source == 'NBC':
+        headlines, descriptions = get_NBC()
+    elif args.source == 'NYT':
+        headlines, descriptions = get_NYT()
+    elif args.source == 'CNN':
+        headlines = get_CNN()
+        descriptions = [''] * len('headlines')
+    
+    data_table = create_data_table(headlines, descriptions)
+    print(data_table)
+    
+if __name__ == '__main__':
+     main()
+#get_CNN()
