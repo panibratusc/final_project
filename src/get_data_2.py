@@ -5,6 +5,12 @@ from bs4 import BeautifulSoup
 from io import StringIO
 import argparse
 
+
+#Making the arrays the same length 
+def arrays_same_length(arr1, arr2):
+    min_length = min(len(arr1), len(arr2))
+    return arr1[:min_length], arr2[:min_length]
+
 # Two NBC html elements we are searching for that contain the caption and description of recent articles
 # <h2 class='wide-tease-item__headline'>
 #<div class='wide-tease-item__description'>
@@ -22,7 +28,7 @@ def get_NBC():
 
 #NYT retrieving data from the World Section
 #<h3 class='css-1kv6qi>
-#<p class='1pga48a>
+#<p class='css-1pga48a>
 def get_NYT():
     url = "https://www.nytimes.com/section/world"
     response = requests.get(url)
@@ -30,7 +36,7 @@ def get_NYT():
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
         headlines_NYT = soup.find_all('h3', class_= 'css-1kv6qi')
-        descriptions_NYT = soup.find_all('p', class_='1pga48a')
+        descriptions_NYT = soup.find_all('p', class_='css-1pga48a')
         headlines_NYT, descriptions_NYT = arrays_same_length(
             [headline.text for headline in headlines_NYT],
             [description.text for description in descriptions_NYT]
@@ -54,11 +60,8 @@ def get_CNN():
         print("Error: Response code", response.status_code)
         return []
     
-#Making the arrays the same length 
-def arrays_same_length(arr1, arr2):
-    min_length = min(len(arr1), len(arr2))
-    return arr1[:min_length], arr2[:min_length]
-    
+
+
 #Creating a datatable for all the news sources
 def create_data_table(headlines, descriptions):
     df = pd.DataFrame({
