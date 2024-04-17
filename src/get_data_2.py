@@ -77,6 +77,7 @@ def create_data_table(headlines, descriptions):
 def main():
     parser = argparse.ArgumentParser(description='create a data table of descriptions and headlines from the various news sources')
     parser.add_argument('--source', nargs = '+', choices=['CNN','NYT','NBC'], help="Specify the news source: 'NBC', 'NYT', or 'CNN'", required=True)
+    parser.add_argument('--scrape', type=int, help="Specify the news source: 'NBC', 'NYT', or 'CNN'")
     args = parser.parse_args()
     data_tables = []
     for source in args.source:
