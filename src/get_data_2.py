@@ -55,7 +55,12 @@ def get_CNN():
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
         headlines_CNN = soup.find_all('span', class_='container__headline-text')
-        return [headline_CNN.text for headline_CNN in headlines_CNN]
+        # descriptions_CNN = [[''] * len(headlines_CNN)]
+        # headlines_CNN, descriptions_CNN = arrays_same_length(
+        #     [headline.text for headline in headlines_CNN],
+        #     [description.text for description in descriptions_CNN]
+        # )
+        return headlines_CNN
     else:
         print("Error: Response code", response.status_code)
         return []
@@ -79,8 +84,7 @@ def main():
         headlines, descriptions = get_NYT()
     elif args.source == 'CNN':
         headlines = get_CNN()
-        descriptions = [''] * len('headlines')
-    
+        descriptions = [''] * len(headlines)   
     data_table = create_data_table(headlines, descriptions)
     print(data_table)
     
