@@ -78,16 +78,25 @@ def main():
     parser = argparse.ArgumentParser(description='create a data table of descriptions and headlines from the various news sources')
     parser.add_argument('--source', choices=['CNN','NYT','NBC'], help="Specify the news source: 'NBC', 'NYT', or 'CNN'", required=True)
     args = parser.parse_args()
+    data_tables = []
     if args.source == 'NBC':
         headlines, descriptions = get_NBC()
+        data_table = create_data_table(headlines, descriptions)
+        data_tables.append(data_table)
     elif args.source == 'NYT':
         headlines, descriptions = get_NYT()
+        data_table = create_data_table(headlines, descriptions)
+        data_tables.append(data_table)
     elif args.source == 'CNN':
         headlines = get_CNN()
-        descriptions = [''] * len(headlines)   
-    data_table = create_data_table(headlines, descriptions)
-    print(data_table)
+        descriptions = [''] * len(headlines)
+        data_table = create_data_table(headlines, descriptions)
+        data_tables.append(data_table)
+        
+    combined_data_table = pd.concat(data_tables, ignore_index=True)
+    print(combined_data_table)
     
-if __name__ == '__main__':
-     main()
+main()
+# if __name__ == '__main__':
+#      main()
 #get_CNN()
