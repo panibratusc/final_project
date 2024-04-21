@@ -55,22 +55,47 @@ def get_NYT(limit=None):
 
 #Retriving data from the CNN website
 #span class = 'container__headline-text'
-def get_CNN(limit=None):
-    url = "https://www.cnn.com/world"
-    response = requests.get(url)
-    if response.status_code == 200:
-        html = response.text
-        soup = BeautifulSoup(html, 'html.parser')
-        headlines_CNN = soup.find_all('span', class_='container__headline-text')
-        headlines = [headline.text.strip() for headline in headlines_CNN]
-        if limit:
-            headlines_CNN = headlines_CNN[:limit]
-        return headlines
-    else:
-        print("Error: Response code", response.status_code)
-        return []
-    
-
+def get_CNN_general(urls,limit=None):
+    all_headlines = []
+    all_content = []
+    all_subheadings = []
+    for url in urls:
+        response = requests.get(url)
+        if response.status_code == 200:
+            html = response.text
+            soup = BeautifulSoup(html, 'html.parser')
+            subheadings_CNN = soup.find_all('h2')
+            headlines_CNN = soup.find_all('h1', class_='headline__text')
+            contents_CNN = soup.find_all('p', class_='paragraph')
+            headlines = [headline.text.strip() for headline in headlines_CNN]
+            subheadings = [subheading.text.strip() for subheading in subheadings_CNN]
+            content = [content.text.strip() for content in contents_CNN]
+            if limit:
+                subheading_CNN = subheading_CNN[:limit]
+                headlines_CNN = headlines_CNN[:limit]
+                content_CNN = content_CNN[:limit]
+                print(headlines, content, subheadings)
+                return headlines, content, subheadings
+        else:
+            print("Error: Response code", response.status_code)
+            return []
+urls = ["https://www.cnn.com/2024/04/20/europe/russia-belgorod-impact-ukraine-war-intl-cmd/index.html","https://www.cnn.com/2024/04/14/europe/russia-tactics-ukraine-energy-power-strikes-intl/index.html", 
+ "https://www.cnn.com/2024/04/20/middleeast/palestinian-ambulance-driver-shot-intl-latam/index.html"]
+#
+# def get_CNN(limit=None):
+#     url = "https://www.cnn.com/world"
+#     response = requests.get(url)
+#     if response.status_code == 200:
+#         html = response.text
+#         soup = BeautifulSoup(html, 'html.parser')
+#         headlines_CNN = soup.find_all('span', class_='container__headline-text')
+#         headlines = [headline.text.strip() for headline in headlines_CNN]
+#         if limit:
+#             headlines_CNN = headlines_CNN[:limit]
+#         return headlines
+#     else:
+#         print("Error: Response code", response.status_code)
+#         return []
 
 #Creating a datatable for all the news sources
 def create_data_table(headlines, descriptions,source):
@@ -93,7 +118,7 @@ def main():
         elif source == 'NYT':
             headlines, descriptions = get_NYT(limit=args.scrape)
         elif source == 'CNN':
-             headlines = get_CNN(limit=args.scrape)
+             headlines = get_CNN_general(limit=args.scrape)
              descriptions = [''] * len(headlines)
         data_table = create_data_table(headlines, descriptions, source)
         data_tables.append(data_table)
